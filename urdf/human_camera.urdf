@@ -1,0 +1,138 @@
+<!-- human_camera.urdf -->
+<robot name="human_camera">
+  <!-- Torso -->
+  <link name="torso">
+    <visual>
+      <geometry>
+        <cylinder radius="0.15" length="0.6"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="10.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.05"/>
+    </inertial>
+  </link>
+
+  <!-- Neck Link -->
+  <link name="neck">
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.1"/>
+      </geometry>
+      <material name="gray">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <!-- Head Link with Camera Eye -->
+  <link name="head">
+    <visual>
+      <geometry>
+        <sphere radius="0.1"/>
+      </geometry>
+      <material name="skin">
+        <color rgba="1 0.8 0.6 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <!-- Left-Right (Yaw) Joint between Torso and Neck -->
+  <joint name="torso_to_neck_yaw" type="revolute">
+    <parent link="torso"/>
+    <child link="neck"/>
+    <origin xyz="0 0 0.35" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/> <!-- Rotate around Z-axis -->
+    <limit lower="-1.0" upper="1.0" effort="1.0" velocity="1.0"/>
+    <dynamics damping="0.1" friction="0.1"/>
+  </joint>
+
+  <!-- Up-Down (Pitch) Joint between Neck and Head -->
+  <joint name="neck_to_head_pitch" type="revolute">
+    <parent link="neck"/>
+    <child link="head"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/> <!-- Rotate around X-axis -->
+    <limit lower="-0.5" upper="0.5" effort="1.0" velocity="1.0"/>
+    <dynamics damping="0.1" friction="0.1"/>
+  </joint>
+
+  <!-- Legs (Fixed to Torso) -->
+  <link name="left_leg">
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.9"/>
+      </geometry>
+      <material name="gray">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+  </link>
+  <joint name="torso_to_left_leg" type="fixed">
+    <parent link="torso"/>
+    <child link="left_leg"/>
+    <origin xyz="0.1 0 -0.65" rpy="0 0 0"/>
+  </joint>
+
+  <link name="right_leg">
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.9"/>
+      </geometry>
+      <material name="gray">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+  </link>
+  <joint name="torso_to_right_leg" type="fixed">
+    <parent link="torso"/>
+    <child link="right_leg"/>
+    <origin xyz="-0.1 0 -0.65" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Camera Eye Sensor on Head -->
+  <gazebo reference="head">
+    <sensor type="camera" name="eye_camera">
+      <pose>0 0 0.1 0 0 0</pose>
+      <camera>
+        <horizontal_fov>1.047</horizontal_fov> <!-- 60 degrees FOV -->
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>50</far>
+        </clip>
+      </camera>
+      <plugin name="gazebo_ros_camera" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>30.0</updateRate>
+        <cameraName>eye_camera</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>head</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+</robot>
