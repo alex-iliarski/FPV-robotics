@@ -19,14 +19,26 @@
     <arg name="camera_z_pos" default="2.0"/>
 
     <!-- Camera orientation (rad) -->
-    <arg name="camera_pitch" default="0.0"/>
+    <!-- <arg name="camera_pitch" default="0.0"/>
     <arg name="camera_yaw" default="0.0"/>
+    <arg name="camera_roll" default="0.0"/> -->
+    <arg name="camera_pitch" default="1.57"/> <!-- Set pitch to 90 degrees upright -->
     <arg name="camera_roll" default="0.0"/>
+    <arg name="camera_yaw" default="0.0"/>
+
+
+    <!-- Human Model position and orientation (adjusted to be upright) -->
+    <arg name="human_x_pos" default="0.0"/>
+    <arg name="human_y_pos" default="0.0"/>
+    <arg name="human_z_pos" default="1.0"/>
+    <arg name="human_pitch" default="0.0"/>
+    <arg name="human_yaw" default="1.57"/>
+    <arg name="human_roll" default="0.0"/>
 
 
   <!-- Load World -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_house.world"/>
+    <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_empty_world.world"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
@@ -39,8 +51,15 @@
     <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" args="-urdf -model turtlebot3_$(arg model) -x $(arg turtle_x_pos) -y $(arg turtle_y_pos) -z $(arg turtle_z_pos) -param robot_description" />
 
     <!-- Spawn Human Camera -->
-    <param name="camera_description" command="$(find xacro)/xacro '$(find FPV-robotics)/urdf/human_camera.urdf'" />
+    <!-- <param name="camera_description" command="$(find xacro)/xacro '$(find FPV-robotics)/urdf/human_camera.urdf'" />
     <node name="spawn_human_camera" pkg="gazebo_ros" type="spawn_model" output="screen" 
-    args="-urdf -param camera_description -model human_camera -x $(arg camera_x_pos) -y $(arg camera_y_pos) -z $(arg camera_z_pos) -R $(arg camera_roll) -P $(arg camera_pitch) -Y $(arg camera_yaw)" />
+    args="-urdf -param camera_description -model human_camera -x $(arg camera_x_pos) -y $(arg camera_y_pos) -z $(arg camera_z_pos) -R $(arg camera_roll) -P $(arg camera_pitch) -Y $(arg camera_yaw)" /> -->
     
+   <!-- Spawn Human Model -->
+    <param name="human_description" command="$(find xacro)/xacro '$(find FPV-robotics)/urdf/humanSubject06_48dof.urdf'" />
+    <node name="spawn_human_model" pkg="gazebo_ros" type="spawn_model" output="screen" 
+          args="-urdf -param human_description -model human_model -x $(arg human_x_pos) -y $(arg human_y_pos) -z $(arg human_z_pos) -R $(arg human_roll) -P $(arg human_pitch) -Y $(arg human_yaw)" />
+
+
+  <!-- TODO: head rolls down the neck when loads in after a few seconds? -->
 </launch>
