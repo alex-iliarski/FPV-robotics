@@ -32,7 +32,7 @@
     <arg name="human_y_pos" default="0.0"/>
     <arg name="human_z_pos" default="1.0"/>
     <arg name="human_pitch" default="0.0"/>
-    <arg name="human_yaw" default="1.57"/>
+    <arg name="human_yaw" default="0.0"/>
     <arg name="human_roll" default="0.0"/>
 
 

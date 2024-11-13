@@ -241,6 +241,9 @@
             </geometry>
         </collision>
 
+        
+
+
     <gravity>0</gravity></link>
 	
 	<link name="RightShoulder">
@@ -932,6 +935,7 @@
         <limit effort="30" velocity="1.0" lower="0" upper="1.57" />
         <axis xyz="0 1 0" />
     </joint>
+    
 	
 	<joint name="jRightC7Shoulder_rotx" type="fixed">
         <origin xyz="0   -0.029713    0.065446" rpy="0 0 0" />
@@ -1375,5 +1379,34 @@
 <origin xyz="0.094314  -0.0015696   -0.013315" rpy="-0.36816     0.44411     0.22503" />
 </sensor>
 
+<!-- Add this to the human model's URDF within the <link name="head"> section -->
+        <gazebo reference="Head">
+            <sensor type="camera" name="eye_camera">
+                <pose>0 0 0.1 0 0 0</pose> <!-- Slightly offset forward -->
+                <camera>
+                    <horizontal_fov>1.047</horizontal_fov> <!-- 60 degrees FOV -->
+                    <image>
+                        <width>640</width>
+                        <height>480</height>
+                        <format>R8G8B8</format>
+                    </image>
+                    <clip>
+                        <near>0.1</near>
+                        <far>50</far>
+                    </clip>
+                </camera>
+                <plugin name="gazebo_ros_camera" filename="libgazebo_ros_camera.so">
+                    <alwaysOn>true</alwaysOn>
+                    <updateRate>30.0</updateRate>
+                    <cameraName>eye_camera</cameraName>
+                    <imageTopicName>image_raw</imageTopicName>
+                    <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+                    <frameName>head</frameName>
+                </plugin>
+            </sensor>
+        </gazebo>
+
 
 </robot>
+
+
