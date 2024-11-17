@@ -1,0 +1,8 @@
+prefix=/home/vboxuser/hw2_catkin_ws/src/FPV-robotics/build/devel
+
+Name: FPV-robotics
+Description: Description of FPV-robotics
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

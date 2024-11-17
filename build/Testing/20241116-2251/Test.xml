@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20241116-2251-Experimental"
+	Name="RoboticsVM"
+	Generator="ctest-3.16.3"
+	CompilerName="/usr/bin/c++"
+	CompilerVersion="9.4.0"
+	OSName="Linux"
+	Hostname="RoboticsVM"
+	OSRelease="5.15.0-125-generic"
+	OSVersion="#135~20.04.1-Ubuntu SMP Mon Oct 7 13:56:22 UTC 2024"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="AuthenticAMD"
+	VendorID="Advanced Micro Devices"
+	FamilyID="25"
+	ModelID="80"
+	ProcessorCacheSize="512"
+	NumberOfLogicalCPU="1"
+	NumberOfPhysicalCPU="1"
+	TotalVirtualMemory="1162"
+	TotalPhysicalMemory="7938"
+	LogicalProcessorsPerPhysical="1"
+	ProcessorClockFrequency="3293.72"
+	>
+	<Testing>
+		<StartDateTime>Nov 16 16:51 CST</StartDateTime>
+		<StartTestTime>1731797462</StartTestTime>
+		<TestList/>
+		<EndDateTime>Nov 16 16:51 CST</EndDateTime>
+		<EndTestTime>1731797462</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

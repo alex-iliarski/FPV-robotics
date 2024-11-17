@@ -62,4 +62,18 @@
 
 
   <!-- TODO: head rolls down the neck when loads in after a few seconds? -->
+
+  <!-- Load head_controllers.yaml to be able to programatically move the human head -->
+  <rosparam file="$(find FPV-robotics)/config/head_controllers.yaml" command="load"/>
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+      args="jC1Head_rotx_position_controller jC1Head_roty_position_controller"/>
+
+
+  <!-- Launch rospy files -->
+  <node pkg="FPV-robotics" type="camera_subscriber.py" name="camera_subscriber" output="screen" />
+  <!-- <node pkg="FPV-robotics" type="head_controller.py" name="head_controller" output="screen" >
+    <param name="initial_delay" value="10.0"/>
+  </node> -->
+
+
 </launch>

@@ -1,0 +1,20 @@
+jC1Head_rotx_position_controller:
+  type: "position_controllers/JointPositionController"
+  joint: "jC1Head_rotx"
+  pid: {p: 100.0, i: 0.01, d: 1.0}
+
+jC1Head_roty_position_controller:
+  type: "position_controllers/JointPositionController"
+  joint: "jC1Head_roty"
+  pid: {p: 100.0, i: 0.01, d: 1.0}
+
+gazebo_ros_control:
+  pid_gains:
+    jC1Head_rotx:
+      p: 100.0
+      i: 0.01
+      d: 1.0
+    jC1Head_roty:
+      p: 30.0
+      i: 0.01
+      d: 1.0

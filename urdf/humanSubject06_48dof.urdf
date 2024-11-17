@@ -924,7 +924,7 @@
         <parent link="Neck" />
         <child link="Head_f1" />
         <dynamics damping="10" friction="0.1" />
-        <limit effort="30" velocity="1.0" lower="0" upper="1.57" />
+        <limit effort="30" velocity="1.0" lower="-1.57" upper="1.57" />
         <axis xyz="1 0 0" />
     </joint>
 	<joint name="jC1Head_roty" type="revolute">
@@ -932,7 +932,7 @@
         <parent link="Head_f1" />
         <child link="Head" />
         <dynamics damping="10" friction="0.1" />
-        <limit effort="30" velocity="1.0" lower="0" upper="1.57" />
+        <limit effort="30" velocity="1.0" lower="-1.57" upper="1.57" />
         <axis xyz="0 1 0" />
     </joint>
     
@@ -1405,6 +1405,34 @@
                 </plugin>
             </sensor>
         </gazebo>
+
+<gazebo>
+  <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    <robotNamespace>/</robotNamespace>
+    <robotParam>human_description</robotParam>
+  </plugin>
+</gazebo>
+
+<transmission name="jC1Head_rotx_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="jC1Head_rotx">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="jC1Head_rotx_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+</transmission>
+
+<transmission name="jC1Head_roty_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="jC1Head_roty">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="jC1Head_roty_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+</transmission>
+
 
 
 </robot>
