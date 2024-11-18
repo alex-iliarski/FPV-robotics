@@ -14,13 +14,13 @@ class HeadController:
 
     def on_press(self, key):
         try:
-            if key == keyboard.Key.up:
-                self.angle_y += 0.1
-            elif key == keyboard.Key.down:
+            if key == keyboard.Key.up: # move head up
                 self.angle_y -= 0.1
-            elif key == keyboard.Key.left:
+            elif key == keyboard.Key.down: # move head down
+                self.angle_y += 0.1
+            elif key == keyboard.Key.left: # move head left
                 self.angle_x += 0.1
-            elif key == keyboard.Key.right:
+            elif key == keyboard.Key.right: # move head right
                 self.angle_x -= 0.1
             self.publish_angles()
         except Exception as e:
