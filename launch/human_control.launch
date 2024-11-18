@@ -70,12 +70,12 @@
 
 
   <!-- Launch rospy files -->
-  <node pkg="FPV-robotics" type="camera_subscriber.py" name="camera_subscriber" output="screen" />
+  <!--  <node pkg="FPV-robotics" type="camera_subscriber.py" name="camera_subscriber" output="screen" /> -->
   <!-- <node pkg="FPV-robotics" type="head_controller.py" name="head_controller" output="screen" >
     <param name="initial_delay" value="10.0"/>
   </node> -->
 
   <node pkg="FPV-robotics" type="head_controller.py" name="head_controller" output="screen" />
-
+  <node pkg="FPV-robotics" type="detector.py" name="detector" output="screen" />
 
 </launch>
