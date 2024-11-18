@@ -14,15 +14,15 @@ class YoloROSNode:
         # Initialize the ROS node
         rospy.init_node('yolo_detector', anonymous=True)
 
-        # Load YOLOv5 model
-        self.model = YOLO(r'/home/isaac/catkin_ws/src/FPV-robotics/src/ros/turtlebot3_yolov8n.pt')
-
         # Set up image subscriber and CvBridge
-        self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
 
         # Optional: Publish annotated images
         self.image_pub = rospy.Publisher('/yolo/detections_image', Image, queue_size=1)
+        self.bridge = CvBridge()
+
+        # Load YOLOv5 model
+        #self.model = YOLO(r'/home/isaac/catkin_ws/src/FPV-robotics/src/ros/turtlebot3_yolov8n.pt')
 
     def image_callback(self, msg):
         try:
@@ -32,10 +32,16 @@ class YoloROSNode:
             rospy.logerr(f"CvBridge Error: {e}")
             return
 
+        self.detect_turtlebot(cv_image)
+
+    def detect_turtlebot(self, image):
         # Run YOLO inference
-        results = self.model.predict(source=cv_image, save=False, save_txt=False, imgsz=640)
+        rospy.loginfo("Received image from camera")
+        #results = self.model.predict(source=image, save=False, save_txt=False, imgsz=640)
+        rospy.loginfo("YOLO inference completed")
 
         # Draw detections on the image
+        '''
         for result in results:
             boxes = result.boxes.xyxy.cpu().numpy()  # Bounding boxes
             scores = result.boxes.conf.cpu().numpy()  # Confidence scores
@@ -45,22 +51,15 @@ class YoloROSNode:
                 x1, y1, x2, y2 = map(int, box)
                 class_name = self.model.names[int(cls)]
                 cv2.rectangle(cv_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(
-                    cv_image,
-                    f"{class_name} {score:.2f}",
-                    (x1, y1 - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
-                    (0, 255, 0),
-                    2,
-                )
                 rospy.loginfo(f"Detected {class_name} with confidence {score:.2f}")
-
+        '''
         # Publish the annotated image
-        annotated_image_msg = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
-        self.image_pub.publish(annotated_image_msg)
+        #annotated_image_msg = self.bridge.cv2_to_imgmsg(image, "bgr8")
 
-        cv2.imshow("YOLO Detection", cv_image)
+        rospy.loginfo("Publishing detections to /yolo/detections_image")
+        #self.image_pub.publish(annotated_image_msg)
+
+        cv2.imshow("YOLO Detection", image)
         cv2.waitKey(1)
 
     def run(self):
@@ -69,7 +68,7 @@ class YoloROSNode:
 
 if __name__ == '__main__':
     try:
-        node = YoloROSNode()
-        node.run()
+        detector = YoloROSNode()
+        detector.run()
     except rospy.ROSInterruptException:
         pass
