@@ -5,7 +5,6 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
 import torch
-import torch.hub
 import numpy as np
 from ultralytics import YOLO
 
@@ -15,14 +14,15 @@ class YoloROSNode:
         rospy.init_node('yolo_detector', anonymous=True)
 
         # Set up image subscriber and CvBridge
-        self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
+        self.image_sub = rospy.Subscriber('/eye_camera/image_raw', Image, self.image_callback)
 
         # Optional: Publish annotated images
         self.image_pub = rospy.Publisher('/yolo/detections_image', Image, queue_size=1)
         self.bridge = CvBridge()
 
-        # Load YOLOv5 model
-        #self.model = YOLO(r'/home/isaac/catkin_ws/src/FPV-robotics/src/ros/turtlebot3_yolov8n.pt')
+        # Load YOLOv8 model
+        rospy.loginfo("Loading YOLOv8 model")
+        self.model = YOLO(r'/home/isaac/catkin_ws/src/FPV-robotics/src/ros/turtlebot3_yolov8n.pt')
 
     def image_callback(self, msg):
         try:
@@ -37,11 +37,10 @@ class YoloROSNode:
     def detect_turtlebot(self, image):
         # Run YOLO inference
         rospy.loginfo("Received image from camera")
-        #results = self.model.predict(source=image, save=False, save_txt=False, imgsz=640)
+        results = self.model.predict(source=image, save=False, save_txt=False, imgsz=640)
         rospy.loginfo("YOLO inference completed")
 
         # Draw detections on the image
-        '''
         for result in results:
             boxes = result.boxes.xyxy.cpu().numpy()  # Bounding boxes
             scores = result.boxes.conf.cpu().numpy()  # Confidence scores
@@ -50,14 +49,14 @@ class YoloROSNode:
             for box, score, cls in zip(boxes, scores, classes):
                 x1, y1, x2, y2 = map(int, box)
                 class_name = self.model.names[int(cls)]
-                cv2.rectangle(cv_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 rospy.loginfo(f"Detected {class_name} with confidence {score:.2f}")
-        '''
+
         # Publish the annotated image
-        #annotated_image_msg = self.bridge.cv2_to_imgmsg(image, "bgr8")
+        annotated_image_msg = self.bridge.cv2_to_imgmsg(image, "bgr8")
 
         rospy.loginfo("Publishing detections to /yolo/detections_image")
-        #self.image_pub.publish(annotated_image_msg)
+        self.image_pub.publish(annotated_image_msg)
 
         cv2.imshow("YOLO Detection", image)
         cv2.waitKey(1)
