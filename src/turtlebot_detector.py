@@ -2,7 +2,7 @@
 
 import rospy
 from sensor_msgs.msg import Image
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Int32MultiArray
 from cv_bridge import CvBridge
 import cv2
 import torch
@@ -18,18 +18,17 @@ class TurtlebotDetector:
         # Set up image subscriber and CvBridge
         self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
 
-        # Publish annotated images and bounding boxes
-        self.image_pub = rospy.Publisher('/turtlebot_detector/detections_image', Image, queue_size=10)
-        self.bbox_pub = rospy.Publisher("/turtlebot_detector/bounding_box", Float32MultiArray, queue_size=10)
+        # Publish bounding boxe
+        self.bbox_pub = rospy.Publisher("/turtlebot_detector/bounding_box", Int32MultiArray, queue_size=10)
 
         # CvBridge for converting ROS Image messages to OpenCV format
         self.bridge = CvBridge()
 
-        self.display_visualization = rospy.get_param("turtlebot_visualization", False)
+        self.display_visualization = False
 
         # Load YOLOv8 model
         rospy.loginfo("Loading YOLOv8 model")
-        self.model = YOLO(r'/home/isaac/catkin_ws/src/fpv_robotics/src/ros/ turtlebot3_yolov8n.pt')
+        self.model = YOLO(r'/home/isaac/catkin_ws/src/fpv_robotics/src/turtlebot3_yolov8n.pt')
 
     def image_callback(self, msg):
         try:
@@ -68,26 +67,16 @@ class TurtlebotDetector:
         # Draw the highest confidence detection, if found
         if best_box is not None:
             x1, y1, x2, y2 = map(int, best_box)
-            class_name = self.model.names[int(best_class)]
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.putText(image, f"{class_name} {best_score:.2f}", (x1, y1 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-            # rospy.loginfo(f"Best detection: {class_name} with confidence {best_score:.2f}")
-
-        # Publish the annotated image
-        annotated_image_msg = self.bridge.cv2_to_imgmsg(image, "bgr8")
-        self.image_pub.publish(annotated_image_msg)
-
-        # Publish the bounding box coordinates and confidence score if a detection was found
-        if best_box is not None:
-            bbox = Float32MultiArray()
+            bbox = Int32MultiArray()
             bbox.data = [x1, y1, x2, y2]
             self.bbox_pub.publish(bbox)
 
-        # Display the annotated image if enabled
-        if self.display_visualization:
-            cv2.imshow("YOLO Detection", image)
-            cv2.waitKey(1)
+            if self.display_visualization:
+                cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(image, f"Turtlebot {best_score:.2f}", (x1, y1 - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv2.imshow("YOLO Detection", image)
+                cv2.waitKey(1)
 
     def run(self):
         rospy.spin()
