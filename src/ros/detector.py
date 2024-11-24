@@ -8,6 +8,7 @@ import cv2
 import torch
 import numpy as np
 from ultralytics import YOLO
+import os
 
 class TurtlebotDetector:
     def __init__(self):
@@ -17,16 +18,18 @@ class TurtlebotDetector:
         # Set up image subscriber and CvBridge
         self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
 
-        # Optional: Publish annotated images
+        # Publish annotated images and bounding boxes
         self.image_pub = rospy.Publisher('/turtlebot_detector/detections_image', Image, queue_size=10)
         self.bbox_pub = rospy.Publisher("/turtlebot_detector/bounding_box", Float32MultiArray, queue_size=10)
+
+        # CvBridge for converting ROS Image messages to OpenCV format
         self.bridge = CvBridge()
+
+        self.display_visualization = rospy.get_param("turtlebot_visualization", False)
 
         # Load YOLOv8 model
         rospy.loginfo("Loading YOLOv8 model")
-        self.model = YOLO(r'/home/isaac/catkin_ws/src/fpv_robotics/src/ros/turtlebot3_yolov8n.pt')
-
-        self.display_visualization = True # Set to False to disable visualization
+        self.model = YOLO(r'/home/isaac/catkin_ws/src/fpv_robotics/src/ros/ turtlebot3_yolov8n.pt')
 
     def image_callback(self, msg):
         try:
@@ -78,7 +81,7 @@ class TurtlebotDetector:
         # Publish the bounding box coordinates and confidence score if a detection was found
         if best_box is not None:
             bbox = Float32MultiArray()
-            bbox.data = [x1, y1, x2, y2, best_score]
+            bbox.data = [x1, y1, x2, y2]
             self.bbox_pub.publish(bbox)
 
         # Display the annotated image if enabled
