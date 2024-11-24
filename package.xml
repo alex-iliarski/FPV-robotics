@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>FPV-robotics</name>
+  <name>fpv_robotics</name>
   <version>0.0.0</version>
-  <description>The FPV-robotics package</description>
+  <description>The fpv_robotics package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
