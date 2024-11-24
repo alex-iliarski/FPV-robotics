@@ -9,17 +9,17 @@ import torch
 import numpy as np
 from ultralytics import YOLO
 
-class YoloROSNode:
+class TurtlebotDetector:
     def __init__(self):
         # Initialize the ROS node
-        rospy.init_node('detector', anonymous=True)
+        rospy.init_node('turtlebot_detector', anonymous=True)
 
         # Set up image subscriber and CvBridge
         self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
 
         # Optional: Publish annotated images
-        self.image_pub = rospy.Publisher('/yolo/detections_image', Image, queue_size=10)
-        self.bbox_pub = rospy.Publisher("/yolo/bounding_box", Float32MultiArray, queue_size=10)
+        self.image_pub = rospy.Publisher('/turtlebot_detector/detections_image', Image, queue_size=10)
+        self.bbox_pub = rospy.Publisher("/turtlebot_detector/bounding_box", Float32MultiArray, queue_size=10)
         self.bridge = CvBridge()
 
         # Load YOLOv8 model
@@ -40,7 +40,11 @@ class YoloROSNode:
 
     def detect_turtlebot(self, image):
         # Run YOLO inference
-        results = self.model.predict(source=image, save=False, save_txt=False, imgsz=640)
+        try:
+            results = self.model.predict(source=image, save=False, save_txt=False, imgsz=640, verbose=False)
+        except Exception as e:
+            rospy.logerr(f"YOLO Error: {e}")
+            return
 
         best_box = None
         best_score = 0.5 # Minimum confidence threshold
@@ -88,7 +92,7 @@ class YoloROSNode:
 
 if __name__ == '__main__':
     try:
-        detector = YoloROSNode()
+        detector = TurtlebotDetector()
         detector.run()
     except rospy.ROSInterruptException:
         pass
