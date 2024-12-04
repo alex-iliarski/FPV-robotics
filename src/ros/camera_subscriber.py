@@ -5,6 +5,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
 import numpy as np
+from ultralytics import YOLO
 
 class TurtleBotDetector:
     def __init__(self):
@@ -16,6 +17,12 @@ class TurtleBotDetector:
         
         # Initialize cv_bridge
         self.bridge = CvBridge()
+        
+        # Load the YOLOv8 model
+        #self.model = YOLO('yolov8_model.pt')  # Replace with the path to your YOLOv8 model file
+        #self.model = YOLO(r'~/hw2_catkin_ws/src/FPV-robotics/src/ros/turtlebot3_yolov8n.pt')
+        self.model = YOLO(r'/home/vboxuser/hw2_catkin_ws/src/FPV-robotics/src/ros/turtlebot3_yolov8n.pt')
+
 
     def image_callback(self, msg):
         # Convert the ROS Image message to a CV2 image
@@ -25,30 +32,27 @@ class TurtleBotDetector:
             rospy.logerr("CvBridge error: {0}".format(e))
             return
 
-        # Detect the TurtleBot using color (for example, detecting a green object)
+        # Detect the TurtleBot using YOLOv8
         self.detect_turtlebot(cv_image)
 
     def detect_turtlebot(self, image):
-        # Convert the image to HSV color space for better color detection
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        # Run the YOLOv8 model on the input image
+        results = self.model.predict(image, verbose=False)
         
-        # Define color range for TurtleBot detection (e.g., green)
-        lower_color = np.array([40, 40, 40])
-        upper_color = np.array([80, 255, 255])
-        
-        # Create a mask for green colors
-        mask = cv2.inRange(hsv, lower_color, upper_color)
-        
-        # Find contours in the mask
-        contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        
-        for contour in contours:
-            # Filter small contours to reduce noise
-            if cv2.contourArea(contour) > 500:
-                # Draw bounding box around the detected TurtleBot
-                x, y, w, h = cv2.boundingRect(contour)
-                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                rospy.loginfo("TurtleBot detected at position: x={}, y={}".format(x, y))
+        # Parse the results
+        for result in results:
+            boxes = result.boxes.xyxy.cpu().numpy()  # Extract bounding box coordinates
+            confidences = result.boxes.conf.cpu().numpy()  # Extract confidence scores
+            class_ids = result.boxes.cls.cpu().numpy()  # Extract class IDs
+            
+            for box, confidence, class_id in zip(boxes, confidences, class_ids):
+                if confidence > 0.5:  # Filter detections with confidence > 0.5
+                    # Draw the bounding box on the image
+                    x1, y1, x2, y2 = map(int, box)
+                    cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    label = f"ID {int(class_id)}: {confidence:.2f}"
+                    cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    rospy.loginfo(f"Detected ID {int(class_id)} at x1={x1}, y1={y1}, x2={x2}, y2={y2}, confidence={confidence:.2f}")
 
         # Display the processed image
         cv2.imshow("TurtleBot Detection", image)

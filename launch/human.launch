@@ -76,4 +76,18 @@
   </node> -->
 
 
+  <!-- Target Model position and orientation (adjusted to be upright) -->
+    <arg name="target_x_pos" default="1.5"/>
+    <arg name="target_y_pos" default="0.0"/>
+    <arg name="target_z_pos" default="0.0"/>
+    <arg name="target_pitch" default="0.0"/>
+    <arg name="target_yaw" default="0.0"/>
+    <arg name="target_roll" default="0.0"/>
+  <!-- Load target object -->
+  <param name="target_description" command="$(find xacro)/xacro '$(find FPV-robotics)/urdf/target.urdf'" />
+  <node name="spawn_target_model" pkg="gazebo_ros" type="spawn_model" output="screen" 
+          args="-urdf -param target_description -model purple_target -x $(arg target_x_pos) -y $(arg target_y_pos) -z $(arg target_z_pos) -R $(arg target_roll) -P $(arg target_pitch) -Y $(arg target_yaw)" />
+
+
+
 </launch>

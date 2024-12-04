@@ -9,6 +9,7 @@
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/vboxuser/hw2_catkin_ws/src/FPV-robotics/build/devel:$CMAKE_PREFIX_PATH"
 export LD_LIBRARY_PATH="/home/vboxuser/hw2_catkin_ws/src/FPV-robotics/build/devel/lib:$LD_LIBRARY_PATH"
+export PATH='/opt/ros/noetic/bin:/home/vboxuser/.local/bin:/home/vboxuser/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
 export PKG_CONFIG_PATH="/home/vboxuser/hw2_catkin_ws/src/FPV-robotics/build/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD='/home/vboxuser/hw2_catkin_ws/src/FPV-robotics/build'
 export ROSLISP_PACKAGE_DIRECTORIES="/home/vboxuser/hw2_catkin_ws/src/FPV-robotics/build/devel/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
