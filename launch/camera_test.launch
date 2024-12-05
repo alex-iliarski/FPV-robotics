@@ -3,9 +3,14 @@
     <arg name="model" default="burger"/>
     <env name="TURTLEBOT3_MODEL" value="$(arg model)"/>
 
+
     <node pkg="fpv_robotics" type="camera_publisher.py" name="camera_publisher" output="screen" />
     <node pkg="fpv_robotics" type="turtlebot_detector.py" name="turtlebot_detector" output="screen" />
     <node pkg="fpv_robotics" type="temp_goal_finder.py" name="temp_goal_finder" output="screen" />
     <node pkg="fpv_robotics" type="visualizer.py" name="bounding_box_visualizer" output="screen" />
+
+
+    <node pkg="fpv_robotics" type="line_finder.py" name="red_line_finder" output="screen" ></node>
+
 
 </launch>

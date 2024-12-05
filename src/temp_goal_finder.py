@@ -56,7 +56,9 @@ class temp_goal_finder:
 
             # Calculate the bounding box for the largest contour
             x, y, w, h = cv2.boundingRect(largest_contour)
-            return [x, y, x + w, y + h]
+            tr = 50
+            if w >= tr or h >= tr:
+                return [x, y, x + w, y + h]
         else:
             # No contours found
             return None

@@ -13,6 +13,10 @@ def draw_bounding_boxes(image, box, color, label=None):
     if label:
         cv2.putText(image, label, (int(x1), int(y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
+def draw_line(image, line, color):
+    x1, y1, x2, y2 = line
+    cv2.line(image, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+
 class BoundingBoxVisualizer:
     def __init__(self):
         rospy.init_node('bounding_box_visualizer', anonymous=True)
@@ -21,11 +25,15 @@ class BoundingBoxVisualizer:
         self.turtlebot_sub = rospy.Subscriber('/turtlebot_detector/bounding_box', Int32MultiArray, self.turtlebot_callback)
         self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
 
+        self.line_sub = rospy.Subscriber('/line_detector/line', Int32MultiArray, self.line_callback)
         self.bridge = CvBridge()
 
         # Store bounding box data
         self.turtlebot = None
         self.goal = None
+
+        # Store line data
+        self.line = None
 
     def goal_callback(self, msg):
         self.goal = np.array(msg.data)
@@ -33,13 +41,26 @@ class BoundingBoxVisualizer:
     def turtlebot_callback(self, msg):
         self.turtlebot = np.array(msg.data)
 
+    def line_callback(self, msg):
+        self.line = np.array(msg.data)
+
+
     def image_callback(self, msg):
         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+
         if self.turtlebot is not None:
-            draw_bounding_boxes(cv_image, self.turtlebot, (255, 0, 0), label="Turtlebot")
-        
+            if len(self.turtlebot) == 4:
+                draw_bounding_boxes(cv_image, self.turtlebot, (255, 0, 0), label="Turtlebot")
+                self.turtlebot = None
+            
         if self.goal is not None:
             draw_bounding_boxes(cv_image, self.goal, (0, 255, 0), label="Goal")
+            self.goal = None
+
+        if self.line is not None:
+            draw_line(cv_image, self.line, (0, 0, 255))
+            self.line = None
+            
 
         cv2.imshow('Bounding Boxes', cv_image)
         cv2.waitKey(1)

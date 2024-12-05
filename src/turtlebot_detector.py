@@ -8,7 +8,6 @@ import cv2
 import torch
 import numpy as np
 from ultralytics import YOLO
-import os
 
 class TurtlebotDetector:
     def __init__(self):
@@ -24,11 +23,10 @@ class TurtlebotDetector:
         # CvBridge for converting ROS Image messages to OpenCV format
         self.bridge = CvBridge()
 
-        self.display_visualization = False
-
         # Load YOLOv8 model
         rospy.loginfo("Loading YOLOv8 model")
         self.model = YOLO(r'/home/isaac/catkin_ws/src/fpv_robotics/src/turtlebot3_yolov8n.pt')
+        rospy.sleep(4)
 
     def image_callback(self, msg):
         try:
@@ -49,10 +47,9 @@ class TurtlebotDetector:
             return
 
         best_box = None
-        best_score = 0.5 # Minimum confidence threshold
-        best_class = None
+        best_score = 0.75  # Minimum confidence threshold
 
-    # Iterate over results to find the highest confidence detection
+        # Iterate over results to find the highest confidence detection
         for result in results:
             boxes = result.boxes.xyxy.cpu().numpy()  # Bounding boxes
             scores = result.boxes.conf.cpu().numpy()  # Confidence scores
@@ -62,21 +59,35 @@ class TurtlebotDetector:
                 if score > best_score:  # Update if this detection is the highest confidence so far
                     best_score = score
                     best_box = box
-                    best_class = cls
 
         # Draw the highest confidence detection, if found
         if best_box is not None:
             x1, y1, x2, y2 = map(int, best_box)
+            
+            # Scale the bounding box by 1.5 times
+            center_x = (x1 + x2) // 2
+            center_y = (y1 + y2) // 2
+            width = x2 - x1
+            height = y2 - y1
+            
+            # 1.5x larger bounding box
+            new_width = int(width * 1.5)
+            new_height = int(height * 1.5)
+            
+            # Calculate new top-left and bottom-right points
+            new_x1 = max(0, center_x - new_width // 2)
+            new_y1 = max(0, center_y - new_height // 2)
+            new_x2 = min(image.shape[1], center_x + new_width // 2)
+            new_y2 = min(image.shape[0], center_y + new_height // 2)
+
+            # Publish the new bounding box
             bbox = Int32MultiArray()
-            bbox.data = [x1, y1, x2, y2]
+            bbox.data = [new_x1, new_y1, new_x2, new_y2]
             self.bbox_pub.publish(bbox)
 
-            if self.display_visualization:
-                cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(image, f"Turtlebot {best_score:.2f}", (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-                cv2.imshow("YOLO Detection", image)
-                cv2.waitKey(1)
+        else:
+            # Publish an empty bounding box if no turtlebot is detected
+            self.bbox_pub.publish(Int32MultiArray())
 
     def run(self):
         rospy.spin()
