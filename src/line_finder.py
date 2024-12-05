@@ -36,6 +36,7 @@ class LineDetector:
     def image_callback(self, msg):
         # Do not search for the guiding line if turtlebot is not detected
         if not self.line_search:
+            self.line_pub.publish(Int32MultiArray(data=[]))
             return
 
         try:

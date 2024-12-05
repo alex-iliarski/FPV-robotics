@@ -10,7 +10,9 @@
     <node pkg="fpv_robotics" type="visualizer.py" name="bounding_box_visualizer" output="screen" />
 
 
-    <node pkg="fpv_robotics" type="line_finder.py" name="red_line_finder" output="screen" ></node>
+    <node pkg="fpv_robotics" type="line_finder.py" name="line_finder" output="screen" />
+
+    <node pkg="fpv_robotics" type="turtlebot_controler.py" name="turtlebot_controler" output="screen" />
 
 
 </launch>

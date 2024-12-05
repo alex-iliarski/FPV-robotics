@@ -42,7 +42,8 @@ class BoundingBoxVisualizer:
         self.turtlebot = np.array(msg.data)
 
     def line_callback(self, msg):
-        self.line = np.array(msg.data)
+        if len(msg.data) == 4:
+            self.line = np.array(msg.data)
 
 
     def image_callback(self, msg):
