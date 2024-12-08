@@ -5,28 +5,30 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import Int32MultiArray
 from cv_bridge import CvBridge
 import cv2
-import torch
-import numpy as np
 from ultralytics import YOLO
+import rospkg
+import os
+
 
 class TurtlebotDetector:
     def __init__(self):
         # Initialize the ROS node
         rospy.init_node('turtlebot_detector', anonymous=True)
 
-        # Set up image subscriber and CvBridge
-        self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
-
-        # Publish bounding boxe
-        self.bbox_pub = rospy.Publisher("/turtlebot_detector/bounding_box", Int32MultiArray, queue_size=10)
-
         # CvBridge for converting ROS Image messages to OpenCV format
         self.bridge = CvBridge()
 
-        # Load YOLOv8 model
-        rospy.loginfo("Loading YOLOv8 model")
-        self.model = YOLO(r'/home/isaac/catkin_ws/src/fpv_robotics/src/turtlebot3_yolov8n.pt')
-        rospy.sleep(4)
+        # Load YOLOv8 nano model for turtlebot detection
+        rospack = rospkg.RosPack()
+        package_path = rospack.get_path('fpv_robotics')
+        model_path = os.path.join(package_path, "src", "models", "turtlebot3_yolov8n.pt")
+        self.model = YOLO(model_path)
+
+        # Set up image subscriber
+        self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
+
+        # Publish bounding box coordinates
+        self.bbox_pub = rospy.Publisher("/fpv_controller/turtlebot_bounding_box", Int32MultiArray, queue_size=10)
 
     def image_callback(self, msg):
         try:

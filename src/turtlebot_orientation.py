@@ -14,28 +14,29 @@ class LineDetector:
 
         # Subscribe to the camera image and bounding box topics
         self.image_sub = rospy.Subscriber("/camera/image_raw", Image, self.image_callback)
-        self.bbox_sub = rospy.Subscriber("/turtlebot_detector/bounding_box", Int32MultiArray, self.bbox_callback)
-
-        self.line_search = False
-        self.bbox = None
-        
-        # Publish the detected line
-        self.line_pub = rospy.Publisher(f"/line_detector/line", Int32MultiArray, queue_size=10)
+        self.bbox_sub = rospy.Subscriber("/fpv_controller/turtlebot_bounding_box", Int32MultiArray, self.bbox_callback)
 
         # Initialize CvBridge
         self.bridge = CvBridge()
+        
+        # Publish the detected line
+        self.line_pub = rospy.Publisher("/fpv_controller/turtlebot_orientation_line", Int32MultiArray, queue_size=10)
+
+        # Initialize control variables
+        self.search = False # Flag to search for the guiding line
+        self.bbox = None # Bounding box coordinates
 
     def bbox_callback(self, msg):
         # check if the message is a valid bounding box
         if len(msg.data) == 4:
-            self.line_search = True
+            self.search = True
             self.bbox = msg.data
         else:
-            self.line_search = False
+            self.search = False
 
     def image_callback(self, msg):
         # Do not search for the guiding line if turtlebot is not detected
-        if not self.line_search:
+        if not self.search:
             self.line_pub.publish(Int32MultiArray(data=[]))
             return
 
@@ -55,7 +56,7 @@ class LineDetector:
         # Blue color ranges in HSV space
         lower_blue = np.array([100, 100, 100])  # Lower bound for blue hue, saturation, and value
         upper_blue = np.array([140, 255, 255])  # Upper bound for blue hue, saturation, and value
-        mask = cv2.inRange(hsv, lower_blue, upper_blue)
+        mask = cv2.inRange(hsv, lower_blue, upper_blue)  # Create a mask for blue color
 
         # Clean up the mask using morphological operations
         kernel = np.ones((5, 5), np.uint8)  # 5x5 kernel for cleaning
@@ -107,6 +108,7 @@ class LineDetector:
                 p1_original = (p1_extended[0] + x1, p1_extended[1] + y1)
                 p2_original = (p2_extended[0] + x1, p2_extended[1] + y1)
 
+                # Publish the detected line
                 line = Int32MultiArray(data=[p1_original[0], p1_original[1], p2_original[0], p2_original[1]])
                 self.line_pub.publish(line)
 

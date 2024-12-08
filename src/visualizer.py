@@ -21,11 +21,13 @@ class BoundingBoxVisualizer:
     def __init__(self):
         rospy.init_node('bounding_box_visualizer', anonymous=True)
 
-        self.goal_sub = rospy.Subscriber('/goal_detector/bounding_box', Int32MultiArray, self.goal_callback)
-        self.turtlebot_sub = rospy.Subscriber('/turtlebot_detector/bounding_box', Int32MultiArray, self.turtlebot_callback)
         self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
 
-        self.line_sub = rospy.Subscriber('/line_detector/line', Int32MultiArray, self.line_callback)
+        self.goal_sub = rospy.Subscriber('/fpv_controller/goal_bounding_box', Int32MultiArray, self.goal_callback)
+        self.turtlebot_sub = rospy.Subscriber('/fpv_controller/turtlebot_bounding_box', Int32MultiArray, self.turtlebot_callback)
+        self.line_sub = rospy.Subscriber('/fpv_controller/turtlebot_orientation_line', Int32MultiArray, self.line_callback)
+
+
         self.bridge = CvBridge()
 
         # Store bounding box data
@@ -47,7 +49,11 @@ class BoundingBoxVisualizer:
 
 
     def image_callback(self, msg):
-        cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        except Exception as e:
+            rospy.logerr(f"CvBridge Error: {e}")
+            return
 
         if self.turtlebot is not None:
             if len(self.turtlebot) == 4:
@@ -55,8 +61,9 @@ class BoundingBoxVisualizer:
                 self.turtlebot = None
             
         if self.goal is not None:
-            draw_bounding_boxes(cv_image, self.goal, (0, 255, 0), label="Goal")
-            self.goal = None
+            if len(self.goal) == 4:
+                draw_bounding_boxes(cv_image, self.goal, (0, 255, 0), label="Goal")
+                self.goal = None
 
         if self.line is not None:
             draw_line(cv_image, self.line, (0, 0, 255))

@@ -3,15 +3,11 @@
     <arg name="model" default="burger"/>
     <env name="TURTLEBOT3_MODEL" value="$(arg model)"/>
 
-    <!-- Camera Publisher -->
-    <node pkg="fpv_robotics" type="camera_publisher.py" name="camera_publisher" output="screen" />
 
-    <!-- Object Detection Nodes -->
+    <node pkg="fpv_robotics" type="camera_publisher.py" name="camera_publisher" output="screen" />
     <node pkg="fpv_robotics" type="turtlebot_detector.py" name="turtlebot_detector" output="screen" />
     <node pkg="fpv_robotics" type="goal_finder.py" name="goal_finder" output="screen" />
-    <node pkg="fpv_robotics" type="turtlebot_orientation.py" name="turtlebot_orientation" output="screen" />
-
-    <!-- Visualizer Node -->
     <node pkg="fpv_robotics" type="visualizer.py" name="bounding_box_visualizer" output="screen" />
+
 
 </launch>
