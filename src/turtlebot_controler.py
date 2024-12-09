@@ -167,14 +167,53 @@ class TurtlebotControler:
         self.cmd_pub.publish(self.cmd)
 
         # Visualization
+        # Visualization
         if self.img is not None:
+            # Draw the orientation line
             cv2.line(self.img, (x1, y1), (x2, y2), (0, 0, 255), 2)
-            cv2.circle(self.img, (int(xg), int(yg)), 5, (0, 255, 0), -1)
-            cv2.circle(self.img, (int(xt), int(yt)), 5, (255, 0, 0), -1)
-            cv2.putText(self.img, f"Angle: {math.degrees(angle):.2f} deg, Distance: {distance:.2f}",
-                        (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-            cv2.imshow("Line and Goal", self.img)
+            
+            # Draw circles for goal and turtlebot centers
+            cv2.circle(self.img, (int(xg), int(yg)), 5, (0, 255, 0), -1)  # Goal (green)
+            cv2.circle(self.img, (int(xt), int(yt)), 5, (255, 0, 0), -1)  # Turtlebot (blue)
+
+            # Calculate triangle points
+            # Point 1: Turtlebot center
+            pt1 = (xt, yt)
+
+            # Point 2: Project turtlebot center onto the goal line (perpendicular to the line)
+            if xg != x1:
+                # Slope and intercept of goal line
+                m_goal = (yg - y1) / (xg - x1)
+                b_goal = y1 - m_goal * x1
+                # Perpendicular slope and intercept through turtlebot center
+                m_perpendicular = -1 / m_goal
+                b_perpendicular = yt - m_perpendicular * xt
+                # Intersection of goal line and perpendicular line
+                x_proj = (b_perpendicular - b_goal) / (m_goal - m_perpendicular)
+                y_proj = m_goal * x_proj + b_goal
+                pt2 = (int(x_proj), int(y_proj))
+            else:
+                # Vertical goal line
+                pt2 = (x1, yt)
+
+            # Point 3: Goal center
+            pt3 = (xg, yg)
+
+            # Draw triangle
+            cv2.line(self.img, pt1, pt2, (0, 255, 255), 2)  # Base of triangle
+            cv2.line(self.img, pt2, pt3, (0, 255, 255), 2)  # Height of triangle
+            cv2.line(self.img, pt3, pt1, (0, 255, 255), 2)  # Hypotenuse
+
+            # Annotate the triangle
+            cv2.putText(self.img, f"Angle: {math.degrees(angle):.2f} deg", 
+                        (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            cv2.putText(self.img, f"Distance: {distance:.2f}", 
+                        (50, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+
+            # Show the visualization
+            cv2.imshow("Line, Goal, and Triangle", self.img)
             cv2.waitKey(1)
+
 
     def run(self):
         while not rospy.is_shutdown():

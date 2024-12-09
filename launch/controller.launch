@@ -13,8 +13,11 @@
     <node pkg="fpv_robotics" type="turtlebot_orientation.py" name="turtlebot_orientation" output="screen" />
 
 
-    <!-- Controller Node-->
-    <node pkg="fpv_robotics" type="turtlebot_controler.py" name="turtlebot_controler" output="screen" />
+    <!-- Controller Node -->
+    <node pkg="fpv_robotics" type="turtlebot_controler.py" name="turtlebot_controller" output="screen" />
+
+    <!-- Visualization Node -->
+    <node pkg="fpv_robotics" type="visualizer.py" name="visualizer" output="screen" />
 
 
 </launch>

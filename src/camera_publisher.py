@@ -10,7 +10,7 @@ def publish_camera():
     pub = rospy.Publisher('/camera/image_raw', Image, queue_size=10)
     rate = rospy.Rate(30)  # Publish at 30 Hz
     bridge = CvBridge()
-    cap = cv2.VideoCapture(2)  # Open the camera (device 2 for usb camera)
+    cap = cv2.VideoCapture(0)  # Open the camera (device 2 for usb camera)
 
     if not cap.isOpened():
         rospy.logerr("Unable to open camera")
