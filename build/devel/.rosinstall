@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/vboxuser/hw2_catkin_ws/src/FPV-robotics/build/devel/setup.sh

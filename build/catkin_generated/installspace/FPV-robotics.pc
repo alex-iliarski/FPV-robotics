@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: FPV-robotics
+Description: Description of FPV-robotics
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -1,0 +1,12 @@
+<launch>
+    <!-- Turtlebot Args -->
+    <arg name="model" default="burger"/>
+    <env name="TURTLEBOT3_MODEL" value="$(arg model)"/>
+
+
+    <node pkg="fpv_robotics" type="camera_publisher.py" name="camera_publisher" output="screen" />
+    <node pkg="fpv_robotics" type="goal_finder.py" name="goal_finder" output="screen" />
+    <node pkg="fpv_robotics" type="visualizer.py" name="bounding_box_visualizer" output="screen" />
+
+
+</launch>
