@@ -9,10 +9,15 @@ This project presents a novel approach to guiding a robot to a goal object using
 - **Pointing Gesture Recognition**: Tracks and recognizes human pointing gestures using the MediaPipe Hands library to select a goal object.
 - **Robot Navigation**: The robot navigates toward the target using a simple algorithm based on the FPV data, adjusting its path as needed.
 
-## View the Report
+## Read the Report
 
 For a detailed explanation of the project, please read the full report:  
 [View the Report](./CSCI_5551_Report%20(1).pdf)
+
+## See it in Action
+
+[![Watch the demo](video_thumbnail.png)](https://drive.google.com/file/d/1HFaeK2NZ62ZJs0dnBVNOORf8K3HwF1CW/view?usp=sharing)
+
 
 ## Future Work
 
